@@ -1,0 +1,21 @@
+# This file is part of djangodbmodel.
+# https://github.com/belonesox/djangodbmodel
+
+# Licensed under the MIT license:
+# http://www.opensource.org/licenses/MIT-license
+# Copyright (c) 2018, Stas Fomin <stas-fomin@yandex.ru>
+
+language: python
+
+python:
+    - "2.7"
+    - "3.4"
+    - "pypy"
+
+install:
+    # install python requirements
+    - make setup
+
+script:
+    # run tests
+    - make test
