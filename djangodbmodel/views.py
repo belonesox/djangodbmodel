@@ -90,8 +90,9 @@ def dbmodel(request):
         edge_color = {'inherit': 'from'}
 
         for field_ in fields + many:
-            if field_.rel:
-                metaref = field_.rel.to._meta
+            if field_.remote_field:
+                rf_ = field_.remote_field
+                metaref = rf_.model._meta
                 if metaref.app_label != model.app_label:
                     edge_color = {'inherit':'both'}
 
