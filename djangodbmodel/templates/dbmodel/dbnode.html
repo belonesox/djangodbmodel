@@ -1,13 +1,10 @@
 <div style="max-width:500px;white-space: normal;">
 <div style="border-bottom:1px solid black">
-    Model: {{ model.model }}<br>
-    App: {{ model.app_label }}
+     {{ model_name }} ({{ app_name }})
 </div>
-<div style="white-space:pre-line; font-size:60%">
-    {{ model.rstdoc }}
-</div>
+{{ model_rstdoc }}
 {% if fields %}
-    <b>Fields:</b>
+ <hr/>
     <ul>
         {% for field in fields %}
         <li>

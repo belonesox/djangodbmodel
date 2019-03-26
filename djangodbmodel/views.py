@@ -103,36 +103,44 @@ def dbmodel(request):
             doc_ = model.__doc__
             title, body, metadata = utils.parse_docstring(doc_)
             if title:
-                title = utils.parse_rst(title, None, None)
+                title = utils.parse_rst(title, None, None).strip()
+                striptags = ["<p>", "</p>"]
+                for tag in striptags:
+                    if title.startswith(tag):
+                        title = title[len(tag):]
+                    if title.endswith(tag):
+                        title = title[:-len(tag)]
+
             if body:
                 body = utils.parse_rst(body, None, None)
             
-            model.rstdoc = title + body
+            model_rstdoc = title + body
             
            
             label = "%s" % (model_name)
             fields = [f for f in model._meta.fields]
             many = [f for f in model._meta. many_to_many]
     
+            fields_table = ''
             fields_table = '''
-    <th><td><span style="background-color:#eeee00;color:#0000ff;font-size:22px">%s</span></td></th>
-    ''' % model_name
+    <th><td><span style="background-color:#eeee00;color:#0000ff;font-size:22px;font-family:Candara">%s</span></td></th>
+    ''' % model.__name__
     
             for field in fields:
                 color = '#000000'
                 if field.unique:
                     color = '#0000ff'
                 fields_table += '''
-            <tr><td><span style="color:%s;">%s</span></td></tr>
+            <tr><td><span style="color:%s;font-size:12px;font-family:Consolas;monospace">%s</span></td></tr>
                     ''' % (color, field.name)
     
             row_height = 14
             table_height = row_height * (len(fields) + 3) * 1.8
     
             imagesrc = '''
-    <svg xmlns="http://www.w3.org/2000/svg" width="256px" height="''' + str(table_height) + '''px">
+    <svg xmlns="http://www.w3.org/2000/svg" width="200px" height="''' + str(table_height) + '''px">
     <rect x="0" y="0" width="100%" height="100%" fill="#ffffff" stroke-width="20" stroke="#ffffff" ></rect>
-        <foreignObject x="10" y="10" width="100%" height="100%">
+        <foreignObject x="10" y="10" width="100%" height="100%" style="overflow: visible;">
         <div xmlns="http://www.w3.org/1999/xhtml" style="font-size:''' + str(row_height) + '''px">
         <table> ''' + fields_table + ''' </table> 
         </div>
@@ -193,9 +201,19 @@ def dbmodel(request):
                         'to':  classname_to_id[wr_],
                         'color': 'red',
                         'dashes': True,
-                        'physics': False,
+                        'physics': True,
                 }
                 edges.append(edge)
+                
+            title_ = get_template("dbmodel/dbnode.html").render(
+                            {
+                             'app_name': app_,  
+                             'model_name': model.__name__,
+                             'model_rstdoc': model_rstdoc.strip(),
+                             'fields':fields,
+                            }
+                        )
+            
                 
             nodes.append(
                 {
@@ -205,11 +223,7 @@ def dbmodel(request):
                     'shape': 'image',
                     'size':  table_height*1.8,
                     'group': app_,
-                    'title': get_template("dbmodel/dbnode.html").render(
-                        # Context(
-                            {'model':model_name, 'fields':fields,}
-                            # )
-                        ),
+                    'title': title_,
                 }
             )
 
